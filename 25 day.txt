@@ -1,0 +1,26 @@
+set target_fld to ""
+
+try
+	
+	set vm_fld_time to do shell script "mdls " & target_fld & " | grep 'kMDItemFSCreationDate' | awk '{print $3}'" as string
+	
+	set today_date to do shell script "date '+%Y,%m,%d'" as string
+	
+	set chars to every character of vm_fld_time
+	repeat with i from 2 to length of chars
+		
+		if item i of chars as text is equal to "-" then
+			set item i of chars to ","
+			
+		end if
+	end repeat
+	
+	set vm_fld_time to every item of chars as string
+	
+	set diff_time to do shell script "python -c 'from datetime import date; print (date(" & today_date & ")-date(" & vm_fld_time & ")).days'"
+	
+	if diff_time is greater than "25" then
+		do shell script "rm -R  " & target_fld with administrator privileges
+	end if
+	
+end try
